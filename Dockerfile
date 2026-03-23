@@ -5,23 +5,23 @@ FROM envoyproxy/envoy:v1.30-latest
 COPY envoy.yaml /etc/envoy/envoy.yaml
 
 # gateway Ingress
-EXPOSE 8080
-# gateway Egress
 EXPOSE 8081
-# tile-server Ingress
+# gateway Egress
 EXPOSE 8082
-# idp Ingress
+# tile-server Ingress
 EXPOSE 8083
+# idp Ingress
+EXPOSE 8084
 # idp egress
-EXPOSE 8084 
-# ldap-server TCP Ingress
 EXPOSE 8085
-# ldap-server HTTP Ingress
+# ldap-server TCP Ingress
 EXPOSE 8086
-# database-reader Ingress
+# ldap-server HTTP Ingress
 EXPOSE 8087
-# database-writer Ingress
+# database-reader Ingress
 EXPOSE 8088
+# database-writer Ingress
+EXPOSE 8089
 # Admin Interface
 EXPOSE 9901
 
