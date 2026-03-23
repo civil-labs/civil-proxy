@@ -1,0 +1,106 @@
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901 # Admin endpoint point, where metrics can also be found
+
+static_resources:
+  listeners:
+  - name: ingress_remote
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8080
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: ingress_http # Metrics for this listener are named as this and can be found at <admin endpoint>/<stat_prefix>
+          codec_type: AUTO # Auto-detect HTTP/1.1 or HTTP/2
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: backend
+              domains: ["*"] # What hostnames to accept for traffic routing
+              routes:
+              - match: { prefix: "/civil.parcels.v1." } # Match any request with this path prefix to this cluster
+                route: { cluster: parcels_service, timeout: 0s } # Zero second timeout counterintuitively means no timeout
+              - match: { prefix: "/civil.tiles.v1." } 
+                route: { cluster: tiles_service, timeout: 0s }
+          http_filters:
+          # Actually creates the connection to the upstream
+          - name: envoy.filters.http.router 
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  listeners:
+  - name: ingress_local
+    address:
+      socket_address:
+          address: 0.0.0.0
+          port_value: 8081
+
+
+  clusters:
+  # Local service
+  - name: local_service
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    # This block is CRITICAL for gRPC to work
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: tile_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                # Use your AWS Cloud Map DNS name here
+                address: localhost
+                port_value: 8080
+
+  # Standard Cluster Template for AWS Service Discovery (Cloud Map)
+  - name: tile_service
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    # This block is CRITICAL for gRPC to work
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: tile_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                # Use your AWS Cloud Map DNS name here
+                address: parcels.civil.local 
+                port_value: 8080
+
+  - name: gateway_service
+    connect_timeout: 0.25s
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: gateway_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: tiles.civil.local
+                port_value: 8080
