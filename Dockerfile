@@ -4,10 +4,24 @@ FROM envoyproxy/envoy:v1.30-latest
 # Copy your configuration file into the container
 COPY envoy.yaml /etc/envoy/envoy.yaml
 
-# Remote Ingress
+# gateway Ingress
 EXPOSE 8080
-# Local Ingress
+# gateway Egress
 EXPOSE 8081
+# tile-server Ingress
+EXPOSE 8082
+# idp Ingress
+EXPOSE 8083
+# idp egress
+EXPOSE 8084 
+# ldap-server TCP Ingress
+EXPOSE 8085
+# ldap-server HTTP Ingress
+EXPOSE 8086
+# database-reader Ingress
+EXPOSE 8087
+# database-writer Ingress
+EXPOSE 8088
 # Admin Interface
 EXPOSE 9901
 

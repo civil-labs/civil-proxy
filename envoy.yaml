@@ -1,6 +1,7 @@
 # ==============================================================================
 # MASTER ENVOY.YAML TEMPLATE
 # Architecture: civil-gateway, tile-server, idp, ldap, db-reader, db-writer
+# Differentiated Ports (0.0.0.0), Multiplexed IDP Listener
 # Service Discovery: AWS Cloud Map (namespace: civil.local)
 # ==============================================================================
 
@@ -33,7 +34,7 @@ static_resources:
 
     - name: civil_gateway_egress
       address:
-        socket_address: { address: 127.0.0.1, port_value: 8000 }
+        socket_address: { address: 127.0.0.1, port_value: 8081 }
       filter_chains:
         - filters:
             - name: envoy.filters.network.http_connection_manager
@@ -73,7 +74,7 @@ static_resources:
     # --------------------------------------------------------------------------
     - name: civil_tile_server_ingress
       address:
-        socket_address: { address: 0.0.0.0, port_value: 8081 }
+        socket_address: { address: 0.0.0.0, port_value: 8082 }
       filter_chains:
         - filters:
             - name: envoy.filters.network.http_connection_manager
@@ -94,17 +95,20 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
     # --------------------------------------------------------------------------
-    # 3. CIVIL-IDP SIDECAR
+    # 3. CIVIL-IDP SIDECAR 
     # --------------------------------------------------------------------------
-    - name: civil_idp_http_ingress
+
+    # Multiplexed Ingress: Handles both HTTP (.well-known) and HTTP/2 (gRPC) on 8082
+    - name: civil_idp_ingress
       address:
-        socket_address: { address: 0.0.0.0, port_value: 8082 }
+        socket_address: { address: 0.0.0.0, port_value: 8083 }
       filter_chains:
         - filters:
             - name: envoy.filters.network.http_connection_manager
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-                stat_prefix: idp_http_ingress
+                stat_prefix: idp_ingress
+                http2_protocol_options: {} # Enables HTTP/2 multiplexing for gRPC
                 route_config:
                   name: local_route
                   virtual_hosts:
@@ -113,27 +117,6 @@ static_resources:
                       routes:
                         - match: { prefix: "/.well-known/" }
                           route: { cluster: local_idp_app_http }
-                http_filters:
-                  - name: envoy.filters.http.router
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
-
-    - name: civil_idp_grpc_ingress
-      address:
-        socket_address: { address: 0.0.0.0, port_value: 8083 }
-      filter_chains:
-        - filters:
-            - name: envoy.filters.network.http_connection_manager
-              typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-                stat_prefix: idp_grpc_ingress
-                http2_protocol_options: {}
-                route_config:
-                  name: local_route
-                  virtual_hosts:
-                    - name: local_service
-                      domains: ["*"]
-                      routes:
                         - match: { prefix: "/" }
                           route: { cluster: local_idp_app_grpc }
                 http_filters:
@@ -321,8 +304,9 @@ static_resources:
 
     # ==========================================================================
     # MESH REMOTE CLUSTERS (Traffic flowing from Sidecar -> Mesh Network)
-    # AWS Cloud Map Endpoints (*.civil.local)
+    # Target ports updated to match the individual remote ingress ports.
     # ==========================================================================
+    
     - name: mesh_tile_server_http
       connect_timeout: 0.25s
       type: STRICT_DNS
@@ -330,7 +314,7 @@ static_resources:
         cluster_name: mesh_tile_server_http
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-tile-server.civil.local, port_value: 8081 } } }
+              - endpoint: { address: { socket_address: { address: civil-tile-server.civil.local, port_value: 8082 } } }
 
     - name: mesh_idp_grpc
       connect_timeout: 0.25s
