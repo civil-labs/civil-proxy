@@ -226,6 +226,7 @@ static_resources:
   clusters:
     # ==========================================================================
     # LOCAL APP CLUSTERS (Traffic flowing from Sidecar -> Local Container)
+    # Applications are now using their standard, native listening ports.
     # ==========================================================================
     - name: local_gateway_app
       connect_timeout: 0.25s
@@ -234,7 +235,7 @@ static_resources:
         cluster_name: local_gateway_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9080 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 8080 } } }
 
     - name: local_tile_server_app
       connect_timeout: 0.25s
@@ -243,7 +244,7 @@ static_resources:
         cluster_name: local_tile_server_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9081 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 8080 } } }
 
     - name: local_idp_app_http
       connect_timeout: 0.25s
@@ -252,7 +253,7 @@ static_resources:
         cluster_name: local_idp_app_http
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9082 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 8080 } } } # Native HTTP
 
     - name: local_idp_app_grpc
       connect_timeout: 0.25s
@@ -262,7 +263,7 @@ static_resources:
         cluster_name: local_idp_app_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9083 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 50051 } } } # Standard gRPC port
 
     - name: local_ldap_app_tcp
       connect_timeout: 0.25s
@@ -271,7 +272,7 @@ static_resources:
         cluster_name: local_ldap_app_tcp
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9085 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 389 } } } # Native LDAP port
 
     - name: local_ldap_app_http
       connect_timeout: 0.25s
@@ -280,7 +281,7 @@ static_resources:
         cluster_name: local_ldap_app_http
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9086 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 8080 } } }
 
     - name: local_db_reader_app
       connect_timeout: 0.25s
@@ -290,7 +291,7 @@ static_resources:
         cluster_name: local_db_reader_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9087 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 50051 } } } # Standard gRPC port
 
     - name: local_db_writer_app
       connect_timeout: 0.25s
@@ -300,7 +301,7 @@ static_resources:
         cluster_name: local_db_writer_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 9088 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 50051 } } } # Standard gRPC port
 
     # ==========================================================================
     # MESH REMOTE CLUSTERS (Traffic flowing from Sidecar -> Mesh Network)
