@@ -331,7 +331,7 @@ static_resources:
         cluster_name: mesh_tile_server_http
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-tile-server.civil.local, port_value: 8083 } } }
+              - endpoint: { address: { socket_address: { address: tile-server.civil.local, port_value: 8083 } } }
 
     - name: mesh_idp
       connect_timeout: 0.25s
@@ -341,7 +341,7 @@ static_resources:
         cluster_name: mesh_idp
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-idp.civil.local, port_value: 8084 } } }
+              - endpoint: { address: { socket_address: { address: idp.civil.local, port_value: 8084 } } }
 
     - name: mesh_ldap_server_tcp
       connect_timeout: 0.25s
@@ -350,7 +350,7 @@ static_resources:
         cluster_name: mesh_ldap_server_tcp
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-ldap-server.civil.local, port_value: 8086 } } }
+              - endpoint: { address: { socket_address: { address: ldap-server.civil.local, port_value: 8086 } } }
 
     - name: mesh_db_reader_grpc
       connect_timeout: 0.25s
@@ -360,7 +360,7 @@ static_resources:
         cluster_name: mesh_db_reader_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-database-reader.civil.local, port_value: 8088 } } }
+              - endpoint: { address: { socket_address: { address: database-reader.civil.local, port_value: 8088 } } }
 
     - name: mesh_db_writer_grpc
       connect_timeout: 0.25s
@@ -370,4 +370,4 @@ static_resources:
         cluster_name: mesh_db_writer_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: civil-database-writer.civil.local, port_value: 8089 } } }
+              - endpoint: { address: { socket_address: { address: database-writer.civil.local, port_value: 8089 } } }
