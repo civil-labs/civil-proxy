@@ -51,22 +51,22 @@ static_resources:
                   name: mesh_routing
                   virtual_hosts:
                     - name: route_to_tile
-                      domains: ["civil-tile-server*"]
+                      domains: ["tile-server*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_tile_server_http }
                     - name: route_to_idp
-                      domains: ["civil-idp*"]
+                      domains: ["idp*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_idp }
                     - name: route_to_db_reader
-                      domains: ["civil-database-reader*"]
+                      domains: ["database-reader*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_db_reader_grpc }
                     - name: route_to_db_writer
-                      domains: ["civil-database-writer*"]
+                      domains: ["database-writer*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_db_writer_grpc }
