@@ -100,7 +100,7 @@ static_resources:
         socket_address: { address: 0.0.0.0, port_value: 8083 }
       filter_chains:
         - filters:
-            # Simple on-disk cache
+            # Simple in-memory cache
             - name: envoy.filters.http.cache
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.http.cache.v3.CacheConfig
