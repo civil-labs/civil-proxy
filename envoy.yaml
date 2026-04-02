@@ -319,7 +319,7 @@ static_resources:
         cluster_name: local_tile_server_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 8080 } } }
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 3000 } } }
 
     - name: local_idp_app_http
       connect_timeout: 0.25s
