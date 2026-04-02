@@ -100,13 +100,7 @@ static_resources:
         socket_address: { address: 0.0.0.0, port_value: 8083 }
       filter_chains:
         - filters:
-            # Simple in-memory cache
-            - name: envoy.filters.http.cache
-              typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.http.cache.v3.CacheConfig
-                typed_config:
-                  # This defines the storage backend. SimpleHttpCache is built-in.
-                  "@type": type.googleapis.com/envoy.extensions.http.cache.simple.v3.SimpleHttpCache
+            # The HTTP Connection Manager is the single Network Filter
             - name: envoy.filters.network.http_connection_manager
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
@@ -120,33 +114,30 @@ static_resources:
                         - match: { prefix: "/" }
                           route: 
                             cluster: local_tile_server_app
-                            # Takes the forwarded host (the local address for the tile server service)
-                            # and turns it back into the entry host for this Civil instance, which the
-                            # gateway stored in x-forwarded-host
                             host_rewrite_header: "x-forwarded-host"  
-                            
                           request_headers_to_add:
-                              # proxy_set_header X-Forwarded-Prefix /tiles;
-                              # Setting a hardcoded static string.
-                              - header:
-                                  key: "x-forwarded-prefix"
-                                  value: "/tiles"
-                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
-
-                              # Explicitly set X-Forwarded-Host
-                              # Uses Envoy's dynamic %REQ(header)% formatter.
-                              - header:
-                                  key: "x-forwarded-host"
-                                  value: "%REQ(X-FORWARDED-HOST)%"
-                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
-
-                              # Explicitly set X-Forwarded-Proto
-                              - header:
-                                  key: "x-forwarded-proto"
-                                  value: "%REQ(X-FORWARDED-PROTO)%"
-                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
-
+                            - header:
+                                key: "x-forwarded-prefix"
+                                value: "/tiles"
+                              append_action: OVERWRITE_IF_EXISTS_OR_ADD
+                            - header:
+                                key: "x-forwarded-host"
+                                value: "%REQ(X-FORWARDED-HOST)%"
+                              append_action: OVERWRITE_IF_EXISTS_OR_ADD
+                            - header:
+                                key: "x-forwarded-proto"
+                                value: "%REQ(X-FORWARDED-PROTO)%"
+                              append_action: OVERWRITE_IF_EXISTS_OR_ADD
+                
+                # The Cache Filter must live INSIDE the Connection Manager
                 http_filters:
+                  - name: envoy.filters.http.cache
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cache.v3.CacheConfig
+                      typed_config:
+                        # The corrected v3 API type URL
+                        "@type": type.googleapis.com/envoy.extensions.http.cache.simple_http_cache.v3.SimpleHttpCacheConfig
+                  
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
