@@ -118,7 +118,34 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match: { prefix: "/" }
-                          route: { cluster: local_tile_server_app }
+                          route: 
+                            cluster: local_tile_server_app
+                            # Takes the forwarded host (the local address for the tile server service)
+                            # and turns it back into the entry host for this Civil instance, which the
+                            # gateway stored in x-forwarded-host
+                            host_rewrite_header: "x-forwarded-host"  
+                            
+                          request_headers_to_add:
+                              # proxy_set_header X-Forwarded-Prefix /tiles;
+                              # Setting a hardcoded static string.
+                              - header:
+                                  key: "x-forwarded-prefix"
+                                  value: "/tiles"
+                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
+
+                              # Explicitly set X-Forwarded-Host
+                              # Uses Envoy's dynamic %REQ(header)% formatter.
+                              - header:
+                                  key: "x-forwarded-host"
+                                  value: "%REQ(X-FORWARDED-HOST)%"
+                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
+
+                              # Explicitly set X-Forwarded-Proto
+                              - header:
+                                  key: "x-forwarded-proto"
+                                  value: "%REQ(X-FORWARDED-PROTO)%"
+                                append_action: OVERWRITE_IF_EXISTS_OR_ADD
+
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
