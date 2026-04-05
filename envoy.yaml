@@ -115,7 +115,7 @@ static_resources:
                           route: 
                             cluster: local_tile_server_app
                             host_rewrite_header: "x-forwarded-host"  
-                            
+
                           request_headers_to_add:
                             - header:
                                 key: "x-forwarded-prefix"
@@ -133,9 +133,11 @@ static_resources:
                           response_headers_to_add:
                             - header:
                                 key: "Cache-Control"
-                                # Because you use explicit ?version= parameter injection, 
-                                # these tiles will NEVER change at this specific URL.
-                                # You can safely tell Envoy (and the browser) to cache it forever.
+                                # Force adds RFC-compliant cache header to the response from
+                                # Martin, ensuring that strictly RFC-compliant envoy caches it.
+                                # Because of the explicit ?version= parameter injection, 
+                                # the tiles will NEVER change at this specific URL.
+                                # So they can safely be cached forever
                                 value: "public, max-age=31536000, immutable"
                               append_action: OVERWRITE_IF_EXISTS_OR_ADD
                 
