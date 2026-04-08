@@ -437,7 +437,7 @@ static_resources:
         cluster_name: local_pgbouncer_app
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 5432 } } } # Standard postgres port
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 6432 } } } # Standard postgres port
 
     # ==========================================================================
     # MESH REMOTE CLUSTERS (Traffic flowing from Sidecar -> Mesh Network)
