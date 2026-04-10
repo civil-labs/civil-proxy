@@ -338,10 +338,8 @@ static_resources:
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
-
-
     # --------------------------------------------------------------------------
-    # 6. CIVIL-DATABASE-PROXY SIDECAR
+    # 7. CIVIL-DATABASE-PROXY SIDECAR
     # --------------------------------------------------------------------------
     - name: civil_db_proxy_ingress
       address:
