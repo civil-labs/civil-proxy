@@ -343,7 +343,7 @@ static_resources:
     # --------------------------------------------------------------------------
     # 6. CIVIL-DATABASE-PROXY SIDECAR
     # --------------------------------------------------------------------------
-- name: civil_db_proxy_ingress
+    - name: civil_db_proxy_ingress
       address:
         socket_address: { address: 0.0.0.0, port_value: 8090 }
       filter_chains:
