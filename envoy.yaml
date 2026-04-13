@@ -222,34 +222,6 @@ static_resources:
                 stat_prefix: egress_ldap_tcp
                 cluster: mesh_ldap_server_tcp
 
-    - name: civil_idp_postgres_egress
-      address:
-        socket_address: { address: 127.0.0.1, port_value: 5432 }
-      filter_chains:
-        - filters:
-            - name: envoy.filters.network.tcp_proxy
-              typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
-                stat_prefix: egress_db_proxy_tcp
-                cluster: mesh_db_proxy_tcp
-
-                access_log:
-                  - name: envoy.access_loggers.stdout
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
-                      # Optional: Format as JSON for easy parsing in AWS CloudWatch / Datadog
-                      log_format:
-                        json_format:
-                          start_time: "%START_TIME%"
-                          method: "%REQ(:METHOD)%"
-                          path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
-                          protocol: "%PROTOCOL%"
-                          response_code: "%RESPONSE_CODE%"
-                          response_flags: "%RESPONSE_FLAGS%"
-                          upstream_cluster: "%UPSTREAM_CLUSTER%"
-                          upstream_host: "%UPSTREAM_HOST%"
-                          duration_ms: "%DURATION%"
-
     # --------------------------------------------------------------------------
     # 4. CIVIL-LDAP-SERVER SIDECAR
     # --------------------------------------------------------------------------
@@ -360,6 +332,38 @@ static_resources:
                         json_format:
                           start_time: "%START_TIME%"
                           protocol: "%PROTOCOL%"
+                          response_flags: "%RESPONSE_FLAGS%"
+                          upstream_cluster: "%UPSTREAM_CLUSTER%"
+                          upstream_host: "%UPSTREAM_HOST%"
+                          duration_ms: "%DURATION%"
+
+    # --------------------------------------------------------------------------
+    # 8. GENERAL EGRESS LISTENERS
+    # --------------------------------------------------------------------------
+
+    - name: civil_postgres_egress
+      address:
+        socket_address: { address: 127.0.0.1, port_value: 5432 }
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.tcp_proxy
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+                stat_prefix: egress_db_proxy_tcp
+                cluster: mesh_db_proxy_tcp
+
+                access_log:
+                  - name: envoy.access_loggers.stdout
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+                      # Optional: Format as JSON for easy parsing in AWS CloudWatch / Datadog
+                      log_format:
+                        json_format:
+                          start_time: "%START_TIME%"
+                          method: "%REQ(:METHOD)%"
+                          path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                          protocol: "%PROTOCOL%"
+                          response_code: "%RESPONSE_CODE%"
                           response_flags: "%RESPONSE_FLAGS%"
                           upstream_cluster: "%UPSTREAM_CLUSTER%"
                           upstream_host: "%UPSTREAM_HOST%"

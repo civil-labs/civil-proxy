@@ -22,6 +22,8 @@ EXPOSE 8087
 EXPOSE 8088
 # database-writer Ingress
 EXPOSE 8089
+# database-proxy Ingress
+EXPOSE 8090
 # Admin Interface
 EXPOSE 9901
 
