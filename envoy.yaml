@@ -419,7 +419,7 @@ static_resources:
         cluster_name: local_ldap_app_tcp
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 389 } } } # Native LDAP port
+              - endpoint: { address: { socket_address: { address: 127.0.0.1, port_value: 3890 } } } # Native LDAP port
 
     - name: local_ldap_app_http
       connect_timeout: 0.25s
