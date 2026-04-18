@@ -1,6 +1,6 @@
 # ==============================================================================
 # MASTER ENVOY.YAML TEMPLATE
-# Architecture: civil-gateway, tile-server, idp, ldap, db-reader, db-writer
+# Architecture: civil-gateway, tile-server, idp, ldap, db-reader, db-writer, db-proxy
 # Differentiated Ports (0.0.0.0), Multiplexed IDP Listener
 # Service Discovery: AWS Cloud Map (namespace: civil.local)
 # ==============================================================================
