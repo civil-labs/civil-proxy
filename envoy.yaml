@@ -61,12 +61,12 @@ static_resources:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_idp }
                     - name: route_to_db_reader
-                      domains: ["database-reader*"]
+                      domains: ["db-reader*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_db_reader_grpc }
                     - name: route_to_db_writer
-                      domains: ["database-writer*"]
+                      domains: ["db-writer*"]
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_db_writer_grpc }
@@ -500,7 +500,7 @@ static_resources:
         cluster_name: mesh_db_reader_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: database-reader.civil.local, port_value: 8088 } } }
+              - endpoint: { address: { socket_address: { address: db-reader.civil.local, port_value: 8088 } } }
 
     - name: mesh_db_writer_grpc
       connect_timeout: 5s
@@ -510,7 +510,7 @@ static_resources:
         cluster_name: mesh_db_writer_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: database-writer.civil.local, port_value: 8089 } } }
+              - endpoint: { address: { socket_address: { address: db-writer.civil.local, port_value: 8089 } } }
 
     - name: mesh_db_proxy_tcp
       connect_timeout: 5s
@@ -520,4 +520,4 @@ static_resources:
         cluster_name: mesh_db_proxy_tcp
         endpoints:
           - lb_endpoints:
-              - endpoint: { address: { socket_address: { address: database-proxy.civil.local, port_value: 8090 } } }
+              - endpoint: { address: { socket_address: { address: db-proxy.civil.local, port_value: 8090 } } }
