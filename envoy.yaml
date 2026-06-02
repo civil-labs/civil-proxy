@@ -87,6 +87,11 @@ static_resources:
                       routes:
                         - match: { prefix: "/" }
                           route: { cluster: mesh_db_writer_grpc }
+                    - name: route_to_idp_grpc
+                      domains: ["*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: mesh_idp }
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
